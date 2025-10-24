@@ -1,0 +1,14 @@
+services:
+  schema-file-server:
+    build: .
+    container_name: schema-file-server
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    volumes:
+      - schemas-data:/app/schemas
+    restart: unless-stopped
+
+volumes:
+  schemas-data:
