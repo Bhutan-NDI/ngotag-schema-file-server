@@ -1,6 +1,7 @@
 services:
   schema-file-server:
     build: .
+    image: schema-file-server
     container_name: schema-file-server
     ports:
       - "4000:4000"
