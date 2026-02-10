@@ -61,25 +61,27 @@ export default {
   }) => {
     const url = new URL(request.url)
     const filepath = decodeURIComponent(url.pathname)
+    const fullPath = "." + filepath + ".json"
 
-    // Try opening the file
-    let file
     try {
-      file = await Deno.open("." + filepath + ".json", { read: true })
-    } catch {
-      // If the file cannot be opened, return a "404 Not Found" response
-      const notFoundResponse = new Response("404 Not Found", { status: 404 })
-      response.body = notFoundResponse.body
-      return
+      const file = await Deno.open(fullPath, { read: true })
+
+      try {
+        const json = await new Response(file.readable).json()
+        response.status = 200
+        response.body = json
+      } catch (error) {
+        response.status = 500
+        response.body = { message: "Invalid schema file format", error: error.message }
+      }
+    } catch (err) {
+      if (err instanceof Deno.errors.NotFound) {
+        response.status = 404
+        response.body = { message: "Schema not found" }
+      } else {
+        response.status = 500
+        response.body = { message: "Failed to read schema file", error: err.message }
+      }
     }
-
-    // Build a readable stream so the file doesn't have to be fully loaded into
-    // memory while we send it
-    const readableStream = file?.readable
-
-    // Build and send the response
-    const result = new Response(readableStream)
-
-    response.body = await result.json()
   },
 }

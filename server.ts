@@ -50,4 +50,4 @@ console.log(`Listening on port: ${APP_PORT}...`)
 
 // Get auth token
 const { token, payload } = await getAuthToken()
-console.log("Auth Token:", token, payload)
+console.log("Auth Token:", token)
