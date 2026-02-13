@@ -64,20 +64,17 @@ export default {
     const fullPath = "." + filepath + ".json"
 
     try {
-      const file = await Deno.open(fullPath, { read: true })
-
-      try {
-        const json = await new Response(file.readable).json()
-        response.status = 200
-        response.body = json
-      } catch (error) {
-        response.status = 500
-        response.body = { message: "Invalid schema file format", error: error.message }
-      }
+      const fileContent = await Deno.readTextFile(fullPath)
+      const json = JSON.parse(fileContent)
+      response.status = 200
+      response.body = json
     } catch (err) {
       if (err instanceof Deno.errors.NotFound) {
         response.status = 404
         response.body = { message: "Schema not found" }
+      } else if (err instanceof SyntaxError) {
+        response.status = 500
+        response.body = { message: "Invalid schema file format", error: err.message }
       } else {
         response.status = 500
         response.body = { message: "Failed to read schema file", error: err.message }
