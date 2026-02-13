@@ -3,6 +3,8 @@ import {
   Request,
 } from "https://deno.land/x/oak@v12.6.1/mod.ts"
 import { existsSync } from "https://deno.land/std@0.209.0/fs/mod.ts"
+import { basename, join } from "https://deno.land/std@0.200.0/path/mod.ts";
+import { normalize } from "node:path";
 
 export default {
   createSchema: async ({
@@ -59,11 +61,28 @@ export default {
     response: Res
     request: Request
   }) => {
-    const url = new URL(request.url)
-    const filepath = decodeURIComponent(url.pathname)
-    const fullPath = "." + filepath + ".json"
-
     try {
+
+      const url = new URL(request.url)
+      const schemaId = basename(decodeURIComponent(url.pathname))
+      
+  
+      const basePath = join(Deno.cwd(), "schemas")
+  
+      if (!/^[\w-]+$/.test(schemaId)) {
+        response.status = 400
+        response.body = { message: "Invalid schema id" }
+        return
+      }
+  
+      const fullPath = normalize(join(basePath, `${schemaId}.json`))
+  
+      if (!fullPath.startsWith(basePath)) {
+        response.status = 400
+        response.body = { message: "Invalid schema path" }
+        return
+      }
+      
       const fileContent = await Deno.readTextFile(fullPath)
       const json = JSON.parse(fileContent)
       response.status = 200
