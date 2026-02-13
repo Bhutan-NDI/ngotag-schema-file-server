@@ -3,8 +3,7 @@ import {
   Request,
 } from "https://deno.land/x/oak@v12.6.1/mod.ts"
 import { existsSync } from "https://deno.land/std@0.209.0/fs/mod.ts"
-import { basename, join } from "https://deno.land/std@0.200.0/path/mod.ts";
-import { normalize } from "node:path";
+import { basename, join, normalize } from "https://deno.land/std@0.200.0/path/mod.ts";
 
 export default {
   createSchema: async ({
@@ -82,7 +81,7 @@ export default {
         response.body = { message: "Invalid schema path" }
         return
       }
-      
+
       const fileContent = await Deno.readTextFile(fullPath)
       const json = JSON.parse(fileContent)
       response.status = 200
