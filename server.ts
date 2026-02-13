@@ -14,11 +14,7 @@ const ignorePatterns: IgnorePattern[] = [
     methods: ["GET"],
   },
   {
-    path: /[a-zA-Z0-9]+/,
-    methods: ["GET"],
-  },
-  {
-    path: /^\/schemas\/[a-zA-Z0-9]+/,
+    path: /^\/schemas\/[\w-]+$/,
     methods: ["GET"],
   },
 ]
